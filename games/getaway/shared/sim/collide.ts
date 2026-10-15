@@ -35,8 +35,9 @@ export {
   type Shape,
 }
 
-/** Collision box as a fraction of the drawn length and width (the bodywork has rounded corners). */
-const INSET = 0.48
+/** Collision box as a fraction of the drawn length and width (the bodywork has rounded corners).
+ *  Increased from 0.48 to 0.65 for stricter collisions and less visual clipping. */
+const INSET = 0.65
 
 export function carHalf(v: Vehicle): [number, number] {
   return [v.length * INSET, v.width * INSET]
