@@ -1,5 +1,5 @@
 import { IDLE_COP_KICK_SECONDS, IDLE_DARK_KICK_SECONDS, IDLE_KICK_SECONDS, IDLE_WARN_SECONDS, MAX_PLAYERS, SNAPSHOT_HZ, TICK_HZ, DT } from "../shared/config"
-import { type ClientMsg, type Picks, type RosterEntry, type ServerMsg, decodeClient, encodeServer, seedOf } from "../shared/protocol"
+import { type ClientMsg, type Picks, type RosterEntry, type ServerMsg, decodeClient, encodeServer, seedOf, CHAT_MAX } from "../shared/protocol"
 import { type Input, NO_INPUT } from "../shared/sim/vehicle"
 import { type Participant, World } from "../shared/sim/world"
 
@@ -102,6 +102,8 @@ export class RoomCore {
   }
 
   private chat(p: Player, text: string) {
+    // Security: enforce max length before processing (verified twice)
+    if (text.length > CHAT_MAX) text = text.slice(0, CHAT_MAX)
     p.chatTokens = Math.min(CHAT_BURST, p.chatTokens + (this.tick - p.chatAt) / CHAT_REFILL_TICKS)
     p.chatAt = this.tick
     if (p.chatTokens < 1) return
