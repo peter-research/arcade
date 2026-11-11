@@ -102,6 +102,10 @@ export class RoomCore {
   }
 
   private chat(p: Player, text: string) {
+    // Security: enforce max length and strip control characters on client-supplied text.
+    const CHAT_MAX = 140
+    text = text.slice(0, CHAT_MAX).replace(/[\x00-\x1F\x7F]/g, "")
+    if (!text.trim()) return
     p.chatTokens = Math.min(CHAT_BURST, p.chatTokens + (this.tick - p.chatAt) / CHAT_REFILL_TICKS)
     p.chatAt = this.tick
     if (p.chatTokens < 1) return
@@ -135,7 +139,9 @@ export class RoomCore {
       // First person into an empty room gets a fresh game instead of a stale round.
       if (this.players.size === 0) this.world = null
       const id = msg.id && !this.players.has(msg.id) ? msg.id : newId()
-      p = { id, name: msg.name, picks: msg.picks, conn, queue: [], ack: 0, input: NO_INPUT, starve: 0, goneAt: 0, idle: 0, last: NO_INPUT, chatTokens: CHAT_BURST, chatAt: this.tick }
+      const NAME_MAX = 24
+      const cleanName = (n: string) => (n || "").slice(0, NAME_MAX).replace(/[\x00-\x1F\x7F]/g, "").trim() || "Player"
+      p = { id, name: cleanName(msg.name), picks: msg.picks, conn, queue: [], ack: 0, input: NO_INPUT, starve: 0, goneAt: 0, idle: 0, last: NO_INPUT, chatTokens: CHAT_BURST, chatAt: this.tick }
       this.players.set(id, p)
       this.syncParticipants()
       this.system(p.name, "joined")

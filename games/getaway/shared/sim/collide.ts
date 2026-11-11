@@ -36,7 +36,7 @@ export {
 }
 
 /** Collision box as a fraction of the drawn length and width (the bodywork has rounded corners). */
-const INSET = 0.48
+const INSET = 0.65  // Stricter hitboxes: less visual clipping, tighter collisions
 
 export function carHalf(v: Vehicle): [number, number] {
   return [v.length * INSET, v.width * INSET]
